@@ -280,11 +280,15 @@ After setting up the development environment, you can build the chaincode using 
 
 ###### Start the Fabric network
 
-https://github.com/osamamagdy/fabric-private-chaincode/blob/feat/create-sample-app/samples/chaincode/simple-asset-go/README.md#time-to-test
+Now that we have the chaincode built and ready to be deployed, we need to start the fabric network before going any further. We're following the FPC [guide](https://github.com/osamamagdy/fabric-private-chaincode/tree/feat/create-sample-app/samples/deployment/test-network#prepare-the-test-network) for preparing and starting the network.
 
 ###### Install the chaincode
 
+FPC provides another `installFPC.sh` script for installing the chaincode on the peers but first we must make sure to set the `CC_ID` with the chaincode name and `CC_VER` with the path to the `mrenclave` of that chaincode. Then we run the script and also start the chaincode containers like [here](https://github.com/osamamagdy/fabric-private-chaincode/tree/feat/create-sample-app/samples/deployment/test-network#install-and-run-the-fpc-chaincode).
+
 ###### Work with the client application
+
+Like explained in the [client](#on-the-client-side-level) section we're following the standard by FPC so using a client application based in the FPC client sdk is the way to go. In [here](https://github.com/osamamagdy/fabric-private-chaincode/blob/feat/create-sample-app/samples/chaincode/simple-asset-go/README.md#invoke-simple-asset) is a guide on how to build and use an fpcclient cli to communicate with the chaincode. It builds the tool, updates the connection configurations, initializes the enclave and invoke the transactions. All needed is to edit the chaincode parameters like `CC_NAME`,`CHANNEL_NAME` ,etc...
 
 ## Limitations
 
