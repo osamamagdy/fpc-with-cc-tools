@@ -40,7 +40,7 @@ In developing the chaincode for the integration of FPC and CC Tools, there are s
 
  CC-tools is a package that provides a relational-like framework for programming fabric chaincodes and it translates every code to a normal fabric chaincode at the end. CC-tools is wrapping the [shim.ChaincodeStub](https://github.com/hyperledger/fabric-chaincode-go/blob/acf92c9984733fb937fba943fbf7397d54368751/shim/interfaces.go#L28) interface from Hyperledger Fabric using [stubWrapper](https://github.com/hyperledger-labs/cc-tools/blob/995dfb2a16decae95a9dbf05424819a1df19abee/stubwrapper/stubWrapper.go#L12) and if you look for example at the [PutState](https://github.com/hyperledger-labs/cc-tools/blob/995dfb2a16decae95a9dbf05424819a1df19abee/stubwrapper/stubWrapper.go#L18) function you notice it only does some in-memory operations and it calls another `sw.Stub.PutState` from the stub passed to it (till now it was always the [stub for standard fabric](https://github.com/hyperledger/fabric-chaincode-go/blob/main/shim/stub.go))
 
- ```
+```
  package stubwrapper
 
  import (
@@ -69,11 +69,11 @@ In developing the chaincode for the integration of FPC and CC Tools, there are s
  return nil
  }
 
- ```
+```
 
  On the other hand for FPC, it also wraps the [shim.ChaincodeStub](https://github.com/hyperledger/fabric-chaincode-go/blob/acf92c9984733fb937fba943fbf7397d54368751/shim/interfaces.go#L28) interface from Hyperledger Fabric but the wrapper it uses (in this case it's [FpcStubInterface](https://github.com/hyperledger/fabric-private-chaincode/blob/33fd56faf886d88a5e5f9a7dba15d8d02d739e92/ecc_go/chaincode/enclave_go/shim.go#L17)) is not always using the functions from the passed stub. With the same example as before, if you look at the [PutState](https://github.com/hyperledger/fabric-private-chaincode/blob/33fd56faf886d88a5e5f9a7dba15d8d02d739e92/ecc_go/chaincode/enclave_go/shim.go#L104) function you can notice it's not using the `sw.Stub.PutState` and going directly to the `rwset.AddWrite` (this is specific to fpc use case as it's not using the fabric proposal response). There are some other functions where the passed `stub` functions are being used.
 
- ```
+```
  package enclave_go
 
  import (
@@ -106,7 +106,7 @@ In developing the chaincode for the integration of FPC and CC Tools, there are s
  return nil
  }
 
- ```
+```
 
  This was also tested practically by logging during the invocation of a transaction that uses the PutState functionality
  ![1726531513506](chaincodeStubOrder.png)
@@ -290,8 +290,20 @@ As explained in the [client](#on-the-client-side-level) section we're following 
 
 ## Limitations
 
-(Marcus: Something we cannot support ... non-goals)
+There are some CC-tools features that contradicts with the security requirements by FPC and how FPC works.
+
+* GetTransient && GetBinding() )(NOT IMPLEMENTED BY CC-TOOLS). This is not needed as the application-level confidentiality is handled by FPC client invocation approach
+* GetSignedProposal() (NOT IMPLEMENTED BY CC-TOOLS)
+
 
 ## Future work
 
-(Marcus: anything that seems to be useful for this project but seems to be out-of-scope)
+Most of the future work is related to FPC as its stubwrapper is the one missing few implementations.
+
+* Add support for [private data collections](https://hyperledger-fabric.readthedocs.io/en/latest/private-data/private-data.html) for FPC chaincodes
+* Complex rich queries and range queries (CouchDB)
+* SplitCompositeKey to retrieve its original attributes
+* GetHistoryForKey
+* Propper handling of transactions' timestamps
+* GetDecorations() (NOT SUPPORTED BY CC-TOOLS ) but mentioned [here](https://github.com/hyperledger/fabric-rfcs/blob/main/text/0000-fabric-private-chaincode-1.0.md#fabric-features-not-yet-supported) to be added in the future
+* Using events
