@@ -111,13 +111,13 @@ In developing the chaincode for the integration of FPC and CC Tools, there are s
  This was also tested practically by logging during the invocation of a transaction that uses the PutState functionality
  ![1726531513506](chaincodeStubOrder.png)
 
- For this, It's better to inject the fpc stubwrapper in the middle between fabric stub and cc-tools stubwrapper
+ For this, It's better to inject the fpc `stubwrapper` in the middle between fabric stub and cc-tools `stubwrapper`
 2. The order needed by how the flow of the code works:
  Since the cc-tools code is translated to normal fabric chaincode before communicating with the ledger, the cc-tools code itself doesn't communicate with the ledger but performs some in-memory operations and then calls the same shim functionality from the fabric code (as explained above).
 
  For FPC, it changes the way dealing with the ledger as it deals with decrypting the arguments before committing the transaction to the ledger and encrypting the response before sending it back to the client.
 
-To meet this requirement, the chaincode must be wrapped with the FPC stubwrapper before being passed to the CC Tools wrapper. ![wrappingOrder](./wrappingOrder.png)
+To meet this requirement, the chaincode must be wrapped with the FPC `stubwrapper` before being passed to the CC Tools wrapper. ![wrappingOrder](./wrappingOrder.png)
 
 Here's an example of how the end user enables FPC for a CC-tools-based chaincode.
 
@@ -196,7 +196,7 @@ For this, we should follow this section in the FPC repo to set the development e
 
 ###### 2. Develop the chaincode in cc-tools and FPC
 
-Fortunately, since the stubwrapper for both cc-tools and fpc are implementing the same interface, the conversion to an fpc chaincode can be done by plug-and-play. This means the user should start by developing the chaincode using cc-tools, and at the main loop where they pass the chaincode instance to the server to start it, they need to wrap it with `fpc.NewPrivateChaincode`. For example, have a look at the cc-tools-demo chaincode below.
+Fortunately, since the `stubwrapper` for both cc-tools and fpc are implementing the same interface, the conversion to an fpc chaincode can be done by plug-and-play. This means the user should start by developing the chaincode using cc-tools, and at the main loop where they pass the chaincode instance to the server to start it, they need to wrap it with `fpc.NewPrivateChaincode`. For example, have a look at the cc-tools-demo chaincode below.
 Before:
 
 ```
@@ -290,20 +290,19 @@ As explained in the [client](#on-the-client-side-level) section we're following 
 
 ## Limitations
 
-There are some CC-tools features that contradicts with the security requirements by FPC and how FPC works.
+There are some standard fabric features that are not compatible with the security properties of FPC and how FPC works and then it's not part of our intention to support.
 
-* GetTransient && GetBinding() )(NOT IMPLEMENTED BY CC-TOOLS). This is not needed as the application-level confidentiality is handled by FPC client invocation approach
-* GetSignedProposal() (NOT IMPLEMENTED BY CC-TOOLS)
-
+* `GetTransient()` and `GetBinding()`. This is not needed as the application-level confidentiality is handled by the FPC client invocation approach
+* GetSignedProposal().
 
 ## Future work
 
-Most of the future work is related to FPC as its stubwrapper is the one missing few implementations.
+The following functionalities are beyond the scope of the integration project as they're missing functionalities from FPC side and once they're implemented, they can be easily integrated and work with cc-tools.
 
 * Add support for [private data collections](https://hyperledger-fabric.readthedocs.io/en/latest/private-data/private-data.html) for FPC chaincodes
 * Complex rich queries and range queries (CouchDB)
-* SplitCompositeKey to retrieve its original attributes
-* GetHistoryForKey
+* `SplitCompositeKey()` to retrieve its original attributes
+* `GetHistoryForKey()`
 * Propper handling of transactions' timestamps
-* GetDecorations() (NOT SUPPORTED BY CC-TOOLS ) but mentioned [here](https://github.com/hyperledger/fabric-rfcs/blob/main/text/0000-fabric-private-chaincode-1.0.md#fabric-features-not-yet-supported) to be added in the future
+* `GetDecorations()` mentioned [here](https://github.com/hyperledger/fabric-rfcs/blob/main/text/0000-fabric-private-chaincode-1.0.md#fabric-features-not-yet-supported) to be added in the future
 * Using events
