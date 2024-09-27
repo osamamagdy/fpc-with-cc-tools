@@ -124,7 +124,7 @@ Here's an example of how the end user enables FPC for a CC-tools-based chaincode
 ```
  
  var cc shim.Chaincode
- if os.Getenv("FPC_MODE") == "true" {
+ if os.Getenv("FPC_ENABLED") == "true" {
  //*Wrap the chaincode with FPC wrapper*//
  cc = fpc.NewPrivateChaincode(new(CCDemo))
  } else {
@@ -242,7 +242,7 @@ func runCCaaS() error {
 
  //*Wrap the chaincode with FPC wrapper*//
  var cc shim.Chaincode
- if os.Getenv("FPC_MODE") == "true" {
+ if os.Getenv("FPC_ENABLED") == "true" {
  cc = fpc.NewPrivateChaincode(new(CCDemo))
  } else {
  cc = new(CCDemo)
