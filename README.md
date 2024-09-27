@@ -111,13 +111,13 @@ In developing the chaincode for the integration of FPC and CC Tools, there are s
  This was also tested practically by logging during the invocation of a transaction that uses the PutState functionality
  ![1726531513506](chaincodeStubOrder.png)
 
- For this, It's better to inject the fpc `stubwrapper` in the middle between fabric stub and cc-tools `stubwrapper`
+ For this, It's better to inject the fpc stub wrapper in the middle between fabric stub and cc-tools stub wrapper
 2. The order needed by how the flow of the code works:
  Since the cc-tools code is translated to normal fabric chaincode before communicating with the ledger, the cc-tools code itself doesn't communicate with the ledger but performs some in-memory operations and then calls the same shim functionality from the fabric code (as explained above).
 
  For FPC, it changes the way dealing with the ledger as it deals with decrypting the arguments before committing the transaction to the ledger and encrypting the response before sending it back to the client.
 
-To meet this requirement, the chaincode must be wrapped with the FPC `stubwrapper` before being passed to the CC Tools wrapper. ![wrappingOrder](./wrappingOrder.png)
+To meet this requirement, the chaincode must be wrapped with the FPC stub wrapper before being passed to the CC Tools wrapper. ![wrappingOrder](./wrappingOrder.png)
 
 Here's an example of how the end user enables FPC for a CC-tools-based chaincode.
 
@@ -196,7 +196,7 @@ For this, we should follow this section in the FPC repo to set the development e
 
 ###### 2. Develop the chaincode in cc-tools and FPC
 
-Fortunately, since the `stubwrapper` for both cc-tools and fpc are implementing the same interface, the conversion to an fpc chaincode can be done by plug-and-play. This means the user should start by developing the chaincode using cc-tools, and at the main loop where they pass the chaincode instance to the server to start it, they need to wrap it with `fpc.NewPrivateChaincode`. For example, have a look at the cc-tools-demo chaincode below.
+Fortunately, since the stub wrapper for both cc-tools and fpc are implementing the same interface, the conversion to an fpc chaincode can be done by plug-and-play. This means the user should start by developing the chaincode using cc-tools, and at the main loop where they pass the chaincode instance to the server to start it, they need to wrap it with `fpc.NewPrivateChaincode`. For example, have a look at the cc-tools-demo chaincode below.
 Before:
 
 ```
